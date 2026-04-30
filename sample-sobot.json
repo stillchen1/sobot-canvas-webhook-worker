@@ -1,0 +1,22 @@
+{
+  "id": "123",
+  "pid": "456",
+  "nick": "John",
+  "uname": "John Doe",
+  "email": "156****1266@example.com;156****1267@example.com",
+  "tel": "123****890",
+  "qq": "123456",
+  "remark": "This is a remark",
+  "is_vip": "0",
+  "vip_level": "Gold",
+  "user_label": "tag1,tag2",
+  "face": "https://example.com/avatar.jpg",
+  "ex_fields": {
+    "field_a": "value_a"
+  },
+  "webhook_info": {
+    "Contact_id": "12123444448",
+    "trigger-id": "1854426358074904576",
+    "extParam": "this is my extParam"
+  }
+}

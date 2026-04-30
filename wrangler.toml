@@ -1,0 +1,11 @@
+﻿name = "sobot-feishu-callback-poc"
+main = "src/index.ts"
+compatibility_date = "2025-12-01"
+
+[observability.logs]
+enabled = true
+
+[[d1_databases]]
+binding = "SOBOT_DB"
+database_name = "sobot-events"
+database_id = "2a628e57-338e-493e-a9a6-25db75131929"

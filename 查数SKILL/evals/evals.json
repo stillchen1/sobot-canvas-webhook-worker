@@ -1,0 +1,90 @@
+{
+  "skill_name": "sobot-canvas-query",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "昨天的 Sobot 数据怎么样？发送率和回复率大概多少？",
+      "expected_output": "识别为意图A（运营报表）。用户未指定游戏 → 默认 gameCode=ptslg；未指定画布 → 不带 canvasCode。调用 /api/report/daily?date=昨天&gameCode=ptslg。输出顶部出现 '范围：ptslg（全部画布）'，展示漏斗、送达率/阅读率/回复率（百分比），如有失败则附风险提示，不原样输出 JSON"
+    },
+    {
+      "id": 2,
+      "prompt": "最近7天的整体运营数据给我看一下",
+      "expected_output": "识别为意图A，gameCode 默认 ptslg，无 canvasCode。调用 /api/stats/overview?from=7天前&to=昨天&gameCode=ptslg（北京时间），输出 '范围：ptslg（全部画布）' + 共N天总览、漏斗数据和各转化率"
+    },
+    {
+      "id": 3,
+      "prompt": "帮我查一下手机号 186****5678 有没有收到消息，最近状态怎样",
+      "expected_output": "识别为意图B（用户查询），gameCode 默认 ptslg，无 canvasCode。实际使用时将用户提供的完整手机号规范化为纯数字，并调用 /api/users/search?tel=<手机号>&gameCode=ptslg。展示 '范围：ptslg（全部画布）' + 用户信息、最近5条事件（北京时间）、状态小结"
+    },
+    {
+      "id": 4,
+      "prompt": "用户 +86 190****2104 有回复吗",
+      "expected_output": "识别为意图B，实际使用时将用户提供的完整手机号规范化为纯数字，gameCode 默认 ptslg。调用 /api/users/search?tel=<手机号>&gameCode=ptslg，根据最新事件给出一句话结论（已回复/已阅读未回复/已送达未阅读等）"
+    },
+    {
+      "id": 5,
+      "prompt": "今天有哪些消息发送失败了？",
+      "expected_output": "识别为意图C（失败记录），gameCode 默认 ptslg，无 canvasCode。调用 /api/events/failed?date=今天&gameCode=ptslg（北京时间），输出范围 'ptslg（全部画布）' + 总数和前5条示例（昵称/格式化手机号·时间），末尾引导进一步查询"
+    },
+    {
+      "id": 6,
+      "prompt": "昨天失败的消息有几条，都是谁",
+      "expected_output": "识别为意图C，gameCode 默认 ptslg，调用昨天日期，输出范围标识，先说总数，再列最多5条，不展示 pid/payloadId 等技术字段"
+    },
+    {
+      "id": 7,
+      "prompt": "4月1号到4月15号这段时间回复率有多少",
+      "expected_output": "识别为意图A，gameCode 默认 ptslg。调用 /api/stats/overview?from=2026-04-01&to=2026-04-15&gameCode=ptslg，重点展示回复率，如偏低则给出风险提示"
+    },
+    {
+      "id": 8,
+      "prompt": "这个 pid 的会话轨迹给我看看：abc123xyz456",
+      "expected_output": "识别为意图B，gameCode 默认 ptslg。调用 /api/conversations/abc123xyz456/events?gameCode=ptslg，按时间升序展示事件时间轴，超10条则首5+末3，顶部展示范围标识"
+    },
+    {
+      "id": 9,
+      "prompt": "wgame 三方支付破冰策略今天发了多少条",
+      "expected_output": "识别为意图A。读 references/games-and-strategies.md：wgame + 三方支付破冰策略 → canvasCode=webstore-new-user。调用 /api/report/daily?date=今天&gameCode=wgame&canvasCode=webstore-new-user，输出范围 'wgame / webstore-new-user'。注意不能错用 ptslg 下的 default"
+    },
+    {
+      "id": 10,
+      "prompt": "ptslg 三方支付破冰策略昨天的数据",
+      "expected_output": "识别为意图A。读注册表：ptslg + 三方支付破冰策略 → canvasCode=default。调用 /api/report/daily?date=昨天&gameCode=ptslg&canvasCode=default，输出范围 'ptslg / default'。验证 skill 不会把 ptslg 的破冰错配成 webstore-new-user"
+    },
+    {
+      "id": 11,
+      "prompt": "wgame 那个手机号 86190****2104 在画布里啥状态",
+      "expected_output": "识别为意图B + gameCode=wgame（用户提到 wgame 但没指定画布，因此不带 canvasCode）。实际使用时将用户提供的完整手机号规范化为纯数字，调用 /api/users/search?tel=<手机号>&gameCode=wgame，范围标识 'wgame（全部画布）'"
+    },
+    {
+      "id": 12,
+      "prompt": "wgame 昨天发送失败的有哪些",
+      "expected_output": "识别为意图C + gameCode=wgame，无 canvasCode。调用 /api/events/failed?date=昨天&gameCode=wgame，范围 'wgame（全部画布）'，列出失败用户"
+    },
+    {
+      "id": 13,
+      "prompt": "查一下 fgame 昨天数据",
+      "expected_output": "fgame 不在已知游戏注册表中，应当追问用户：'你要查哪个游戏？例如 ptslg、wgame'，而不是猜测或默认 ptslg"
+    },
+    {
+      "id": 14,
+      "prompt": "我要给 igame 配置三方支付破冰策略，URL 怎么填？",
+      "expected_output": "识别为意图D（webhook URL 生成）。读 references/games-and-strategies.md：igame 是新游戏（不在注册表），三方支付破冰策略在新游戏下无固定映射 → 应建议 canvasCode=webstore-new-user 并先与用户确认 gameCode=igame、canvasCode=webstore-new-user。确认后输出 7 条 URL（按进入流程/WA已发送/WA已送达/WA已阅读/WA已回复/WA点击按钮/WA发送失败 顺序），URL 形如 https://sobot-feishu-callback-poc.aurorastudio.workers.dev/webhooks/sobot/igame/webstore-new-user/{eventKey}。末尾给出验证提示，并提醒把 igame 加到注册表"
+    },
+    {
+      "id": 15,
+      "prompt": "新游戏 xgame 的 webhook 回调地址生成一下",
+      "expected_output": "识别为意图D。用户没说画布 → 必须追问要给哪个策略/画布配置，绝不能默认 default 或省略。不要直接生成 URL"
+    },
+    {
+      "id": 16,
+      "prompt": "帮我列下 wgame 三方支付破冰策略所有节点的回调 URL",
+      "expected_output": "识别为意图D。读注册表：wgame + 三方支付破冰策略 → canvasCode=webstore-new-user。先与用户确认 gameCode=wgame、canvasCode=webstore-new-user，确认后按固定顺序输出 7 条 URL（基础路径 /webhooks/sobot/wgame/webstore-new-user/{eventKey}）。不能误填成 ptslg 下的 default"
+    },
+    {
+      "id": 17,
+      "prompt": "智齿流程画布每个节点的回调 URL 是什么",
+      "expected_output": "识别为意图D。用户没给游戏也没给画布，必须先追问 gameCode 和 canvasCode（用英文短名），不能直接输出占位符 URL"
+    }
+  ]
+}
